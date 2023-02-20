@@ -34,25 +34,45 @@ namespace TicTacToe
                 FormatText(bannerPrint, Banner(), field);
                 FormatText(gameboardPrint, GameBoard(), field);
 
-                if (PlayerMove(field, PlayerInput(DetermineSign(round)), DetermineSign(round)) != false)
+                switch (round % 2)
                 {
-                    if (DetermineWinner(field, DetermineSign(round)) == true)
-                    {
-                        DisplayMessage("CONGRATULATIONS, YOU'VE WON THE GAME", bannerPrint, gameboardPrint, field);
+                    case 0:
+                        ComputerMove(field, DetermineSign(round));
 
                         break;
-                    }
-                    else if (DetermineWinner(field, DetermineSign(round)) == false && round == 9)
-                    {
-                        DisplayMessage("IT'S A DRAW!", bannerPrint, gameboardPrint, field);
+
+                    case 1:
+                        //if (PlayerMove(field, PlayerInput(DetermineSign(round)), DetermineSign(round)) == false)
+                        //    InvalidInputMessage();
+
+                        ComputerMove(field, DetermineSign(round));
 
                         break;
-                    }
-                    
-                    round++;
+
+                    default:
+                        break;
                 }
-                else
-                    InvalidInputMessage();
+
+                if (DetermineWinner(field, DetermineSign(round)) == true)
+                {
+                    DisplayMessage("CONGRATULATIONS, YOU'VE WON THE GAME", bannerPrint, gameboardPrint, field);
+
+                    break;
+                }
+                else if (DetermineWinner(field, DetermineSign(round)) == true)
+                {
+                    DisplayMessage("YOU'VE LOST!", bannerPrint, gameboardPrint, field);
+
+                    break;
+                }
+                else if (DetermineWinner(field, DetermineSign(round)) == false && round == 10)
+                {
+                    DisplayMessage("IT'S A DRAW!", bannerPrint, gameboardPrint, field);
+
+                    break;
+                }
+
+                round++;
 
                 Console.Clear();
             }
@@ -186,11 +206,9 @@ namespace TicTacToe
 
         static string DetermineSign(int round)
         {
-            int player;
-
             string sign;
 
-            player = round % 2;
+            int player = round % 2;
 
             if (player == 1)
                 sign = "O";
@@ -204,7 +222,7 @@ namespace TicTacToe
         {
             bool winner = false;
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i <= 2; i++)
             {
                 if (field[i, 0] == sign && field[i, 1] == sign && field[i, 2] == sign || field[0, i] == sign && field[1, i] == sign && field[2, i] == sign)
                     winner = true;
@@ -232,7 +250,7 @@ namespace TicTacToe
 
         static void InvalidInputMessage()
         {
-            PrintTextCenter("Invalid input. Try again.");
+            PrintTextCenter("      Invalid input. Try again.      ");
 
             Thread.Sleep(1000);
             Console.Clear();
@@ -246,7 +264,7 @@ namespace TicTacToe
 
             while (moveControl == false)
             {
-                int computerInput = rnd.Next(0, 9);
+                int computerInput = rnd.Next(1, 10);
 
                 moveControl = PlayerMove(field, computerInput, determineSign);
             }
