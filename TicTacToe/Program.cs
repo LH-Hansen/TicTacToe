@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using static System.Net.Mime.MediaTypeNames;
+using System.Numerics;
 
 namespace TicTacToe
 {
@@ -16,44 +17,64 @@ namespace TicTacToe
                 TicTacToe();
             }
         }
-
+        
         static void TicTacToe()
-        {
+        {   
             int bannerPrint = 0, gameboardPrint = 1;
             int round = 1;
 
             bool resetGame = false;
 
-            string[] field = new string[9];
+            string[,] field = new string[9, 3];
 
             SetFields(field);
 
-            while (round <= 10 && resetGame == false)
+            while (round < 10 && resetGame == false)
             {
                 FormatText(bannerPrint, Banner(), field);
                 FormatText(gameboardPrint, GameBoard(), field);
+
                 if (PlayerMove(field, PlayerInput(DetermineSign(round)), DetermineSign(round)) != false)
+                {
+                    if (DetermineWinner(field, DetermineSign(round)) == true)
+                    {
+                        DisplayMessage("CONGRATULATIONS, YOU'VE WON THE GAME", bannerPrint, gameboardPrint, field);
+
+                        break;
+                    }
+                    else if (DetermineWinner(field, DetermineSign(round)) == false && round == 9)
+                    {
+                        DisplayMessage("IT'S A DRAW!", bannerPrint, gameboardPrint, field);
+
+                        break;
+                    }
+                    
                     round++;
+                }
+                else
+                    InvalidInputMessage();
 
                 Console.Clear();
             }
         }
 
-        static void SetFields(string[] field)
+        static void SetFields(string[,] field)
         {
-            for (int i = 0; i < field.Length; i++)
+            for (int i = 0; i < 3; i++)
             {
-                field[i] = Convert.ToString(i + 1);
+                field[0, i] = Convert.ToString(i + 1);
+                field[1, i] = Convert.ToString(i + 4);
+                field[2, i] = Convert.ToString(i + 7);
             }
         }
 
-        static void FormatText(int definePrint, string text, string[] field)
+        static void FormatText(int definePrint, string text, string[,] field)
         {
             string separator = "\r\n";
 
             int count = 100;
 
-            string [] strlist = text.Split(separator, count,
+            string[] strlist = text.Split(separator, count,
                    StringSplitOptions.RemoveEmptyEntries);
 
             if (definePrint == 0)
@@ -78,10 +99,10 @@ namespace TicTacToe
             Console.WriteLine(text);
         }
 
-        static void PrintBoard(string text, string[] field)
+        static void PrintBoard(string text, string[,] field)
         {
             Console.SetCursorPosition((Console.WindowWidth - text.Length) / 2, Console.CursorTop);
-            Console.WriteLine(text, field[0], field[1], field[2], field[3], field[4], field[5], field[6], field[7], field[8]);
+            Console.WriteLine(text, field[0, 0], field[0, 1], field[0, 2], field[1, 0], field[1, 1], field[1, 2], field[2, 0], field[2, 1], field[2, 2]);
         }
 
         static string Banner()
@@ -98,45 +119,49 @@ namespace TicTacToe
 
         static string GameBoard()
         {
-            string gameBoard = "           _           _           \r\n" +
-                               "          | |         | |          \r\n" +
-                               "          | |         | |          \r\n" +
+            string gameBoard =   "           _           _           \r\n" +
+                                 "          | |         | |          \r\n" +
+                                 "          | |         | |          \r\n" +
                                "     {0}    | |    {1}    | |    {2}\r\n" +
-                               "          | |         | |          \r\n" +
-                               " _________| |_________| |_________ \r\n" +
-                               "|_________| |_________| |_________|\r\n" +
-                               "          | |         | |          \r\n" +
-                               "          | |         | |          \r\n" +
+                                 "          | |         | |          \r\n" +
+                                 " _________| |_________| |_________ \r\n" +
+                                 "|_________| |_________| |_________|\r\n" +
+                                 "          | |         | |          \r\n" +
+                                 "          | |         | |          \r\n" +
                                "     {3}    | |    {4}    | |    {5}\r\n" +
-                               "          | |         | |          \r\n" +
-                               " _________| |_________| |_________ \r\n" +
-                               "|_________| |_________| |_________|\r\n" +
-                               "          | |         | |          \r\n" +
-                               "          | |         | |          \r\n" +
+                                 "          | |         | |          \r\n" +
+                                 " _________| |_________| |_________ \r\n" +
+                                 "|_________| |_________| |_________|\r\n" +
+                                 "          | |         | |          \r\n" +
+                                 "          | |         | |          \r\n" +
                                "     {6}    | |    {7}    | |    {8}\r\n" +
-                               "          | |         | |          \r\n" +
-                               "          |_|         |_|          \r\n" +
-                               "\r\n";
+                                 "          | |         | |          \r\n" +
+                                 "          |_|         |_|          \r\n" +
+                                 "\r\n";
 
             return gameBoard;
         }
 
-        static bool PlayerMove(string[] field, int playerInput, string determineSign)
+        static bool PlayerMove(string[,] field, int playerInput, string determineSign)
         {
             bool validInput = false;
 
-            if (playerInput >= 1 && playerInput <= 10 && field[playerInput - 1] != "O" && field[playerInput - 1] != "X")
-            {
-                field[playerInput - 1] = determineSign;
+            int inputConditionMin = 1;
+            int inputConditionMax = 3;
 
-                validInput = true;
-            }
-            else
+            for (int i = 0; i < 3; i++)
             {
-                PrintTextCenter("Invalid input. Try again.");
+                if (playerInput >= inputConditionMin && playerInput <= inputConditionMax && field[i, playerInput - inputConditionMin] != "O" && field[i, playerInput - inputConditionMin] != "X")
+                {
+                    field[i, playerInput - inputConditionMin] = determineSign;
 
-                Thread.Sleep(1000);
-                Console.Clear();
+                    validInput = true;
+
+                    break;
+                }
+
+                inputConditionMin = inputConditionMin + 3;
+                inputConditionMax = inputConditionMax + 3;
             }
 
             return validInput;
@@ -144,11 +169,17 @@ namespace TicTacToe
 
         static int PlayerInput(string player)
         {
-            int move;
+            int move = -1;
 
             Console.Write("\n\t\t\t\t\t  {0}'s move: ", player);
 
-            move = Convert.ToInt32(Console.ReadLine());
+            ConsoleKeyInfo userInput = Console.ReadKey(true);
+
+            if (char.IsDigit(userInput.KeyChar))
+                move = int.Parse(userInput.KeyChar.ToString());
+
+            else
+                InvalidInputMessage();
 
             return move;
         }
@@ -168,5 +199,68 @@ namespace TicTacToe
 
             return sign;
         }
+
+        static bool DetermineWinner(string[,] field, string sign)
+        {
+            bool winner = false;
+
+            for (int i = 0; i < 3; i++)
+            {
+                if (field[i, 0] == sign && field[i, 1] == sign && field[i, 2] == sign || field[0, i] == sign && field[1, i] == sign && field[2, i] == sign)
+                    winner = true;
+
+                else if (field[0, 0] == sign && field[1, 1] == sign && field[2, 2] == sign || field[0, 2] == sign && field[1, 1] == sign && field[2, 0] == sign)
+                    winner = true;
+            }
+
+            return winner;
+        }
+
+        static void DisplayMessage(string message, int bannerPrint, int gameboardPrint, string[,] field)
+        {
+            Console.Clear();
+
+            FormatText(bannerPrint, Banner(), field);
+            FormatText(gameboardPrint, GameBoard(), field);
+
+            PrintTextCenter(message);
+            PrintTextCenter("Press enter to play again");
+
+            Console.ReadKey();
+            Console.Clear();
+        }
+
+        static void InvalidInputMessage()
+        {
+            PrintTextCenter("Invalid input. Try again.");
+
+            Thread.Sleep(1000);
+            Console.Clear();
+        }
+
+        static bool ComputerMove(string[,] field, string determineSign)
+        {
+            Random rnd = new Random();
+
+            bool moveControl = false;
+
+            while (moveControl == false)
+            {
+                int computerInput = rnd.Next(0, 9);
+
+                moveControl = PlayerMove(field, computerInput, determineSign);
+            }
+
+            return moveControl;
+        }
     }
 }
+
+
+/*
+
+Mangler:
+ * Lav en pre-game menu hvor spiller(re) kan indtaste navn ( dont wanna do this)
+ * Lav single-player mode mod computer
+
+*/
