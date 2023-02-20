@@ -19,9 +19,10 @@ namespace TicTacToe
         }
         
         static void TicTacToe()
-        {   
-            int bannerPrint = 0, gameboardPrint = 1;
-            int round = 1;
+        {
+            int bannerPrint = 0, 
+                gameboardPrint = 1,
+                round = 1;
 
             bool resetGame = false;
 
@@ -42,11 +43,9 @@ namespace TicTacToe
                         break;
 
                     case 1:
-                        //if (PlayerMove(field, PlayerInput(DetermineSign(round)), DetermineSign(round)) == false)
-                        //    InvalidInputMessage();
-
-                        ComputerMove(field, DetermineSign(round));
-
+                        if (PlayerMove(field, PlayerInput(DetermineSign(round)), DetermineSign(round)) == false)
+                            InvalidInputMessage();
+                                
                         break;
 
                     default:
@@ -56,12 +55,6 @@ namespace TicTacToe
                 if (DetermineWinner(field, DetermineSign(round)) == true)
                 {
                     DisplayMessage("CONGRATULATIONS, YOU'VE WON THE GAME", bannerPrint, gameboardPrint, field);
-
-                    break;
-                }
-                else if (DetermineWinner(field, DetermineSign(round)) == true)
-                {
-                    DisplayMessage("YOU'VE LOST!", bannerPrint, gameboardPrint, field);
 
                     break;
                 }
@@ -125,6 +118,28 @@ namespace TicTacToe
             Console.WriteLine(text, field[0, 0], field[0, 1], field[0, 2], field[1, 0], field[1, 1], field[1, 2], field[2, 0], field[2, 1], field[2, 2]);
         }
 
+        static void DisplayMessage(string message, int bannerPrint, int gameboardPrint, string[,] field)
+        {
+            Console.Clear();
+
+            FormatText(bannerPrint, Banner(), field);
+            FormatText(gameboardPrint, GameBoard(), field);
+
+            PrintTextCenter(message);
+            PrintTextCenter("Press enter to play again");
+
+            Console.ReadKey();
+            Console.Clear();
+        }
+
+        static void InvalidInputMessage()
+        {
+            PrintTextCenter("      Invalid input. Try again.      ");
+
+            Thread.Sleep(1000);
+            Console.Clear();
+        }
+
         static string Banner()
         {
             string welcomeMessage = "  __          __  _                              _          _______ _        _______           _______         " + "\r\n" +
@@ -162,29 +177,18 @@ namespace TicTacToe
             return gameBoard;
         }
 
-        static bool PlayerMove(string[,] field, int playerInput, string determineSign)
+        static string DetermineSign(int round)
         {
-            bool validInput = false;
+            string sign;
 
-            int inputConditionMin = 1;
-            int inputConditionMax = 3;
+            int player = round % 2;
 
-            for (int i = 0; i < 3; i++)
-            {
-                if (playerInput >= inputConditionMin && playerInput <= inputConditionMax && field[i, playerInput - inputConditionMin] != "O" && field[i, playerInput - inputConditionMin] != "X")
-                {
-                    field[i, playerInput - inputConditionMin] = determineSign;
+            if (player == 1)
+                sign = "O";
+            else
+                sign = "X";
 
-                    validInput = true;
-
-                    break;
-                }
-
-                inputConditionMin = inputConditionMin + 3;
-                inputConditionMax = inputConditionMax + 3;
-            }
-
-            return validInput;
+            return sign;
         }
 
         static int PlayerInput(string player)
@@ -204,18 +208,29 @@ namespace TicTacToe
             return move;
         }
 
-        static string DetermineSign(int round)
+        static bool PlayerMove(string[,] field, int playerInput, string determineSign)
         {
-            string sign;
+            bool validInput = false;
 
-            int player = round % 2;
+            int inputConditionMin = 1,
+                inputConditionMax = 3;
 
-            if (player == 1)
-                sign = "O";
-            else
-                sign = "X";
+            for (int i = 0; i < 3; i++)
+            {
+                if (playerInput >= inputConditionMin && playerInput <= inputConditionMax && field[i, playerInput - inputConditionMin] != "O" && field[i, playerInput - inputConditionMin] != "X")
+                {
+                    field[i, playerInput - inputConditionMin] = determineSign;
 
-            return sign;
+                    validInput = true;
+
+                    break;
+                }
+
+                inputConditionMin = inputConditionMin + 3;
+                inputConditionMax = inputConditionMax + 3;
+            }
+
+            return validInput;
         }
 
         static bool DetermineWinner(string[,] field, string sign)
@@ -232,28 +247,6 @@ namespace TicTacToe
             }
 
             return winner;
-        }
-
-        static void DisplayMessage(string message, int bannerPrint, int gameboardPrint, string[,] field)
-        {
-            Console.Clear();
-
-            FormatText(bannerPrint, Banner(), field);
-            FormatText(gameboardPrint, GameBoard(), field);
-
-            PrintTextCenter(message);
-            PrintTextCenter("Press enter to play again");
-
-            Console.ReadKey();
-            Console.Clear();
-        }
-
-        static void InvalidInputMessage()
-        {
-            PrintTextCenter("      Invalid input. Try again.      ");
-
-            Thread.Sleep(1000);
-            Console.Clear();
         }
 
         static bool ComputerMove(string[,] field, string determineSign)
