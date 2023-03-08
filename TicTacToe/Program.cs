@@ -415,21 +415,22 @@ namespace TicTacToe
                 line++;
             }
 
-            line = 0;
+             moveControl = RndStrat(field, sign, rnd, moveControl);
 
-            while (moveControl == false || line == 9)
-            {
-                moveControl = RndStrat(field, sign, rnd, moveControl);
-
-                line++;
-            }
 
             if (moveControl == false)
+            {
                 for (int i = 1; i < 9; i++)
                 {
                     moveControl = PlayerMove(field, i, sign);
+
+                    if (moveControl == true)
+                    {
+                        break;
+                    }
                 }
-            
+            }
+
             return moveControl;
         }
 
@@ -587,10 +588,11 @@ namespace TicTacToe
         }
 
         static bool RndStrat(string[,] field, string sign, Random rnd, bool moveControl)
-        { 
-            int computerInput = -1;
+        {
+            int computerInput = -1,
+                line = 0;
 
-            do
+            while (moveControl == false && line <= 9)
             {
                 int initialInput = rnd.Next(1, 10);
 
@@ -601,7 +603,8 @@ namespace TicTacToe
 
                 moveControl = PlayerMove(field, computerInput, sign);
 
-            } while (moveControl == false);
+                line++;
+            }
 
             return moveControl;
         }
