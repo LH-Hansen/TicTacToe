@@ -607,11 +607,3 @@ namespace TicTacToe
         }
     }
 }
-
-/*
-
-Mangler:
- * Lav en pre-game menu hvor spiller(re) kan indtaste navn ( dont wanna do this)
-
-
-*/
