@@ -11,6 +11,7 @@ using System.Xml.Serialization;
 using System.Runtime.CompilerServices;
 using System.Net.Mail;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace TicTacToe
 {
@@ -31,18 +32,17 @@ namespace TicTacToe
                 round = 1,
                 player1;
 
-            bool resetGame = false,
-                 validInput;
+            bool resetGame = false;
 
             string[,] field = new string[3, 3];
 
             SetFields(field);
 
-            player1 = StartChoice(field, bannerPrint, gameboardPrint);
+            player1 = StartChoice(field, bannerPrint);
 
             while (round < 10 && resetGame == false)
             {
-                validInput= false;
+                bool playerTurn = false;
 
                 FormatText(bannerPrint, Banner(), field);
                 FormatText(gameboardPrint, GameBoard(), field);
@@ -51,83 +51,77 @@ namespace TicTacToe
                 {
                     case 0:
 
-                        if (player1 == 2)
-                        {
-                            do
-                            {
-                                if (PlayerMove(field, PlayerInput(DetermineSign(round)), DetermineSign(round)) == true)
-                                    validInput = true;
-
-                                FormatText(bannerPrint, Banner(), field);
-                                FormatText(gameboardPrint, GameBoard(), field);
-
-                            } while (validInput == false);
-                        }
-                        else if (player1 == 1)
+                        if (player1 == 1)
                         {
                             ComputerMove(field, DetermineSign(round));
-                            Thread.Sleep(1000);
+                            Thread.Sleep(500);
                         }
+                        
+                        else if (player1 == 2)
+                            playerTurn = InititalaizePlayer(field, round, playerTurn, bannerPrint, gameboardPrint);
+
+                        else if (player1 == 3)
+                            playerTurn = InititalaizePlayer(field, round, playerTurn, bannerPrint, gameboardPrint);
 
                         break;
 
                     case 1:
                         if (player1 == 1)
-                        {
-                            do
-                            {
-                                if (PlayerMove(field, PlayerInput(DetermineSign(round)), DetermineSign(round)) == true)
-                                    validInput = true;
+                            playerTurn = InititalaizePlayer(field, round, playerTurn, bannerPrint, gameboardPrint);
 
-                                FormatText(bannerPrint, Banner(), field);
-                                FormatText(gameboardPrint, GameBoard(), field);
-
-                            } while (validInput == false);
-                        }
                         else if (player1 == 2)
                         {
                             ComputerMove(field, DetermineSign(round));
-
                             Thread.Sleep(500);
                         }
 
-                        break;
+                        else if (player1 == 3)
+                            playerTurn = InititalaizePlayer(field, round, playerTurn, bannerPrint, gameboardPrint);
 
-                    default:
                         break;
                 }
 
-                if (DetermineWinner(field, DetermineSign(round)) == true)
+                if (DetermineWinner(field, DetermineSign(round)) == true && playerTurn == true)
                 {
-                    DisplayMessage("CONGRATULATIONS, YOU'VE WON THE GAME", bannerPrint, gameboardPrint, field);
+                    DisplayMessage("CONGRATULATIONS, YOU WON!", bannerPrint, gameboardPrint, field);
 
-                    break;
+                    resetGame = true;
+                }
+                else if (DetermineWinner(field, DetermineSign(round)) == true && playerTurn == false)
+                {
+                    DisplayMessage("HOW UNFORTUNATE, YOU LOST!", bannerPrint, gameboardPrint, field);
+
+                    resetGame = true;
                 }
                 else if (DetermineWinner(field, DetermineSign(round)) == false && round >= 9)
                 {
                     DisplayMessage("IT'S A DRAW!", bannerPrint, gameboardPrint, field);
 
-                    break;
+                    resetGame = true;
                 }
 
                 round++;
 
                 Console.Clear();
             }
+            GC.Collect();
         }
 
-        static int StartChoice(string[,] field, int bannerPrint, int gameboardPrint)
+        static int StartChoice(string[,] field, int bannerPrint)
         {
 
-            int firstPlayer = -1;
+            int firstPlayer;
 
             while (true)
             {
                 FormatText(bannerPrint, Banner(), field);
 
                 Console.WriteLine();
-                PrintTextCenter("Choose who should start");
-                Console.Write("\n\t\t\t\t\t\t1. You\n\t\t\t\t\t\t2. Computer\n\t\t\t\t\t\t");
+                PrintTextCenter("Choose what gamemode to play");
+                Console.Write("\n\t\t\t\t\t\t    1. You   VS  Bot" +
+                              "\n\t\t\t\t\t\t    2. Bot   VS  You" +
+                              "\n\t\t\t\t\t\t    3. User  VS  User" +
+                              "\n\t\t\t\t\t\t    ");
 
                 ConsoleKeyInfo UserInput = Console.ReadKey();
 
@@ -136,7 +130,7 @@ namespace TicTacToe
                 else
                     firstPlayer = -1;
 
-                if (firstPlayer == 1 || firstPlayer == 2)
+                if (firstPlayer >= 1 && firstPlayer <= 3)
                 {
                     Console.Clear();
                     break;
@@ -267,6 +261,7 @@ namespace TicTacToe
 
             if (player == 1)
                 sign = "O";
+
             else
                 sign = "X";
 
@@ -607,6 +602,25 @@ namespace TicTacToe
             }
 
             return moveControl;
+        }
+
+        static bool InititalaizePlayer(string[,] field, int round, bool playerTurn, int bannerPrint, int gameboardPrint)
+        {
+            bool validInput = false;
+
+            playerTurn = true;
+
+            do
+            {
+                if (PlayerMove(field, PlayerInput(DetermineSign(round)), DetermineSign(round)) == true)
+                    validInput = true;
+
+                FormatText(bannerPrint, Banner(), field);
+                FormatText(gameboardPrint, GameBoard(), field);
+
+            } while (validInput == false);
+
+            return playerTurn;
         }
     }
 }
