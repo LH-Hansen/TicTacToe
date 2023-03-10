@@ -26,127 +26,92 @@ namespace TicTacToe
         }
         
         static void TicTacToe()
-        {
+        {       //Banner- & gameboard prin are used to choose how the respective string are printed
             int bannerPrint = 0,
                 gameboardPrint = 1,
-                round = 1,
+                turn = 1,
                 player1;
 
             bool resetGame = false;
 
             string[,] field = new string[3, 3];
 
+            //Sets the gamefield to defualt values
             SetFields(field);
 
+            //Lets the player select the gamemode
             player1 = StartChoice(field, bannerPrint);
 
-            while (round < 10 && resetGame == false)
+            while (turn < 10 && resetGame == false)
             {
                 bool playerTurn = false;
 
+                //Prints the UI
                 FormatText(bannerPrint, Banner(), field);
                 FormatText(gameboardPrint, GameBoard(), field);
 
-                switch (round % 2)
-                {
-                    case 0:
 
+                //Keeps track of who is playing each turn depending on gamemode
+                switch (turn % 2)
+                {
+                    case 1:
+                        //Player VS Computer
+                        if (player1 == 1)
+                            playerTurn = InititalaizePlayer(field, turn, bannerPrint, gameboardPrint);
+
+                        //Computer VS Player
+                        else if (player1 == 2)
+                        {
+                            ComputerMove(field, DetermineSign(turn));
+                            Thread.Sleep(500);
+                        }
+
+
+                        //Player VS Player
+                        else if (player1 == 3)
+                            playerTurn = InititalaizePlayer(field, turn, bannerPrint, gameboardPrint);
+                        break;
+
+                    case 0:
                         if (player1 == 1)
                         {
-                            ComputerMove(field, DetermineSign(round));
+                            ComputerMove(field, DetermineSign(turn));
                             Thread.Sleep(500);
                         }
                         
                         else if (player1 == 2)
-                            playerTurn = InititalaizePlayer(field, round, playerTurn, bannerPrint, gameboardPrint);
+                            playerTurn = InititalaizePlayer(field, turn, bannerPrint, gameboardPrint);
 
                         else if (player1 == 3)
-                            playerTurn = InititalaizePlayer(field, round, playerTurn, bannerPrint, gameboardPrint);
-
-                        break;
-
-                    case 1:
-                        if (player1 == 1)
-                            playerTurn = InititalaizePlayer(field, round, playerTurn, bannerPrint, gameboardPrint);
-
-                        else if (player1 == 2)
-                        {
-                            ComputerMove(field, DetermineSign(round));
-                            Thread.Sleep(500);
-                        }
-
-                        else if (player1 == 3)
-                            playerTurn = InititalaizePlayer(field, round, playerTurn, bannerPrint, gameboardPrint);
+                            playerTurn = InititalaizePlayer(field, turn, bannerPrint, gameboardPrint);
 
                         break;
                 }
 
-                if (DetermineWinner(field, DetermineSign(round)) == true && playerTurn == true)
-                {
-                    DisplayMessage("CONGRATULATIONS, YOU WON!", bannerPrint, gameboardPrint, field);
+                //Displays winning message depending on outcome
+                if (DetermineWinner(field, DetermineSign(turn)) == true && playerTurn == true)
+                resetGame = DisplayEndMessage("CONGRATULATIONS, YOU WON!", bannerPrint, gameboardPrint, field);
 
-                    resetGame = true;
-                }
-                else if (DetermineWinner(field, DetermineSign(round)) == true && playerTurn == false)
-                {
-                    DisplayMessage("HOW UNFORTUNATE, YOU LOST!", bannerPrint, gameboardPrint, field);
+                //Displays losing message depending on outcome
+                else if (DetermineWinner(field, DetermineSign(turn)) == true && playerTurn == false)
+                    resetGame = DisplayEndMessage("HOW UNFORTUNATE, YOU LOST!", bannerPrint, gameboardPrint, field);
 
-                    resetGame = true;
-                }
-                else if (DetermineWinner(field, DetermineSign(round)) == false && round >= 9)
-                {
-                    DisplayMessage("IT'S A DRAW!", bannerPrint, gameboardPrint, field);
+                //Displays draw message depending on outcome
+                else if (DetermineWinner(field, DetermineSign(turn)) == false && turn >= 9)
+                    resetGame = DisplayEndMessage("IT'S A DRAW!", bannerPrint, gameboardPrint, field);
 
-                    resetGame = true;
-                }
-
-                round++;
+                turn++;
 
                 Console.Clear();
             }
+
+            //Makes system reclaim memory, as the program keept using more for each turn prior
             GC.Collect();
-        }
-
-        static int StartChoice(string[,] field, int bannerPrint)
-        {
-
-            int firstPlayer;
-
-            while (true)
-            {
-                FormatText(bannerPrint, Banner(), field);
-
-                Console.WriteLine();
-                PrintTextCenter("Choose what gamemode to play");
-                Console.Write("\n\t\t\t\t\t\t    1. You   VS  Bot" +
-                              "\n\t\t\t\t\t\t    2. Bot   VS  You" +
-                              "\n\t\t\t\t\t\t    3. User  VS  User" +
-                              "\n\t\t\t\t\t\t    ");
-
-                ConsoleKeyInfo UserInput = Console.ReadKey();
-
-                if (char.IsDigit(UserInput.KeyChar))
-                    firstPlayer = int.Parse(UserInput.KeyChar.ToString());
-                else
-                    firstPlayer = -1;
-
-                if (firstPlayer >= 1 && firstPlayer <= 3)
-                {
-                    Console.Clear();
-                    break;
-                }
-                else
-                { 
-                    InvalidInputMessage();
-                    Console.Clear();
-                }
-            }
-
-            return firstPlayer;
         }
 
         static void SetFields(string[,] field)
         {
+            //Sets fields to default
             for (int i = 0; i < 3; i++)
             {
                 field[0, i] = Convert.ToString(i + 1);
@@ -161,13 +126,16 @@ namespace TicTacToe
 
             int count = 100;
 
+            //Takes string and splits it into an array with a seperator
             string[] strlist = text.Split(separator, count,
                    StringSplitOptions.RemoveEmptyEntries);
 
+            //Uses banner- or gamemodeprint to determine what method should be used to print 
             if (definePrint == 0)
             {
                 for (int i = 0; i < strlist.Length; i++)
                 {
+                    //Prints strings in array in the center of the console
                     PrintTextCenter(strlist[i]);
                 }
             }
@@ -175,6 +143,7 @@ namespace TicTacToe
             {
                 for (int i = 0; i < strlist.Length; i++)
                 {
+                    //Prints strings in array in the center of the console with the field array and values
                     PrintBoard(strlist[i], field);
                 }
             }
@@ -182,18 +151,23 @@ namespace TicTacToe
 
         static void PrintTextCenter(string text)
         {
+            //Prints any string in the center of the console
             Console.SetCursorPosition((Console.WindowWidth - text.Length) / 2, Console.CursorTop);
             Console.WriteLine(text);
         }
 
         static void PrintBoard(string text, string[,] field)
-        {
+        {   
+            //Prints strings in the center of the console, with field array values
             Console.SetCursorPosition((Console.WindowWidth - text.Length) / 2, Console.CursorTop);
             Console.WriteLine(text, field[0, 0], field[0, 1], field[0, 2], field[1, 0], field[1, 1], field[1, 2], field[2, 0], field[2, 1], field[2, 2]);
         }
 
-        static void DisplayMessage(string message, int bannerPrint, int gameboardPrint, string[,] field)
+        static bool DisplayEndMessage(string message, int bannerPrint, int gameboardPrint, string[,] field)
         {
+            //Prints end message
+            bool resetGame = true;
+
             Console.Clear();
 
             FormatText(bannerPrint, Banner(), field);
@@ -203,13 +177,16 @@ namespace TicTacToe
             PrintTextCenter("Press enter to play again");
 
             Thread.Sleep(1000);
-
             Console.ReadKey();
             Console.Clear();
+
+            //Returns the reset
+            return resetGame;
         }
 
         static void InvalidInputMessage()
         {
+            //Prints error message
             PrintTextCenter("      Invalid input. Try again.      ");
 
             Thread.Sleep(1000);
@@ -218,6 +195,7 @@ namespace TicTacToe
 
         static string Banner()
         {
+            //The default banner to be printed
             string welcomeMessage = "  __          __  _                              _          _______ _        _______           _______         " + "\r\n" +
                                     @" \ \        / / | |                            | |        |__   __(_)      |__   __|         |__   __|        " + "\r\n" +
                                     @"  \ \  /\  / /__| | ___ ___  _ __ ___   ___    | |_ ___      | |   _  ___     | | __ _  ___     | | ___   ___ " + "\r\n" +
@@ -225,11 +203,13 @@ namespace TicTacToe
                                     @"    \  /\  /  __/ | (_| (_) | | | | | |  __/   | || (_) |    | |  | | (__     | | (_| | (__     | | (_) |  __/" + "\r\n" +
                                     @"     \/  \/ \___|_|\___\___/|_| |_| |_|\___|    \__\___/     |_|  |_|\___|    |_|\__,_|\___|    |_|\___/ \___|" + "\r\n";
 
+            //Returns the banner
             return welcomeMessage;
         }
 
         static string GameBoard()
         {
+            //Default gameboard to be printed
             string gameBoard =   "           _           _           \r\n" +
                                  "          | |         | |          \r\n" +
                                  "          | |         | |          \r\n" +
@@ -250,14 +230,16 @@ namespace TicTacToe
                                  "          |_|         |_|          \r\n" +
                                  "\r\n";
 
+            //Returns the gameboard
             return gameBoard;
         }
 
-        static string DetermineSign(int round)
+        static string DetermineSign(int turn)
         {
+            //Keeps track of what sign the current player is using
             string sign;
 
-            int player = round % 2;
+            int player = turn % 2;
 
             if (player == 1)
                 sign = "O";
@@ -265,24 +247,251 @@ namespace TicTacToe
             else
                 sign = "X";
 
+            //Returns current-player sign
             return sign;
+        }
+
+        static bool ComputerMove(string[,] field, string sign)
+        {
+            Random rnd = new();
+
+            bool moveControl = false;
+
+            //Arrays, used to store and updae values from calculations
+            int[] xArray = new int[3],
+                  yArray = new int[3],
+                  xyArray = new int[1],
+                  yxArray = new int[1];
+
+            int xyValue = 0,
+                yxValue = 0,
+                line = 0;
+
+            bool isCircle;
+            
+            //Looks at what the computers sign is for the game
+            if (sign == "O")
+                isCircle = true;
+            else
+                isCircle = false;
+
+            do
+            {
+                int xValue = 0,
+                    yValue = 0;
+
+                //Loops 3 times, to go through each line through each axis
+                for (int i = 0; i < 3; i++)
+                {   
+                    //Changes calculations based on sign
+                    switch (isCircle)
+                    {
+                        //Calculates values for the axis'
+                        case true:
+                            yValue += CalculateAxisValue(field, sign, "O", "X", line, i);
+
+                            xValue += CalculateAxisValue(field, sign, "O", "X", i, line);
+
+                            xyValue += CalculateXY(field, sign, "O", "X", line, i);
+
+                            yxValue = CalculateYX(field, sign, "O", "X", line, i, yxValue);
+
+                            break;
+
+                        case false:
+                            yValue += CalculateAxisValue(field, sign, "X", "O", line, i);
+
+                            xValue += CalculateAxisValue(field, sign, "X", "O", i, line);
+
+                            xyValue += CalculateXY(field, sign, "X", "O", line, i);
+
+                            yxValue = CalculateYX(field, sign, "X", "O", line, i, yxValue);
+
+                            break;
+                    }
+                }
+
+                //Adds the values to the arrays
+                yArray[line] = yValue;
+                xArray[line] = xValue;
+                xyArray[0] = xyValue;
+                yxArray[0] = yxValue;
+
+                line++;
+
+              //Loops 3 times to go through all lines on the axis
+            } while (line < 3);
+
+            //Resets line to 0 to re-use
+            line = 0;
+
+            //Determines if computer should attack of defend based on the array values.
+            while (moveControl == false && line < 1)
+            {
+                for (int i = 0; i < 3; i++)
+                {   
+                    //If it can make a winning move, it will do so.
+                    moveControl = AttackOrDefend(field, sign, xArray, yArray, xyArray, yxArray, moveControl, i, 2);
+                }
+
+                if (moveControl == false)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        //If it can't make a winning move, and the opponent is able to, it will defend 
+                        moveControl = AttackOrDefend(field, sign, xArray, yArray, xyArray, yxArray, moveControl, i, -2);
+                    }
+                }
+                line++;
+            }
+
+            //If it cant win nor see a reason to defend, it will place its sign on a strategic place.
+             moveControl = RndStrat(field, sign, rnd, moveControl);
+
+            //Should it not be able to place it strategically it means the game will tie and it'll fill in wherever it can
+            if (moveControl == false)
+            {
+                for (int i = 1; i < 9; i++)
+                {
+                    moveControl = PlayerMove(field, i, sign);
+
+                    if (moveControl == true)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return moveControl;
         }
 
         static int PlayerInput(string player)
         {
+            //Takes the players input and saves it if it is valid
             int move = -1;
 
             Console.Write("\n\t\t\t\t\t  {0}'s move: ", player);
 
+            //Takes the input without needing to press enter
             ConsoleKeyInfo userInput = Console.ReadKey(true);
 
+            //makes sure it's a valid move
             if (char.IsDigit(userInput.KeyChar))
                 move = int.Parse(userInput.KeyChar.ToString());
 
             else
                 InvalidInputMessage();
 
+            //Returns valid move
             return move;
+        }
+
+        static int StartChoice(string[,] field, int bannerPrint)
+        {
+            //Gives the user the ability to choose which gamemode to play
+            int firstPlayer;
+
+            //Loops until a valid choice has been made
+            while (true)
+            {
+                FormatText(bannerPrint, Banner(), field);
+
+                Console.WriteLine();
+                PrintTextCenter("Choose what gamemode to play");
+                Console.Write("\n\t\t\t\t\t\t    1. You   VS  Bot" +
+                              "\n\t\t\t\t\t\t    2. Bot   VS  You" +
+                              "\n\t\t\t\t\t\t    3. User  VS  User" +
+                              "\n\t\t\t\t\t\t    ");
+
+                //Takes the input
+                ConsoleKeyInfo UserInput = Console.ReadKey();
+
+                //Makes sure its valid
+                if (char.IsDigit(UserInput.KeyChar))
+                    firstPlayer = int.Parse(UserInput.KeyChar.ToString());
+                else
+                    firstPlayer = -1;
+
+                //Throws error if false
+                if (firstPlayer >= 1 && firstPlayer <= 3)
+                {
+                    Console.Clear();
+                    break;
+                }
+                else
+                {
+                    InvalidInputMessage();
+                    Console.Clear();
+                }
+            }
+
+            //Valid inut it returned
+            return firstPlayer;
+        }
+
+        static int CalculateAxisValue(string[,] field, string sign, string mySign, string opponentSign, int x, int y)
+        {
+            //Calculates values on x and y axis
+            int value = 0;
+            
+            //Every time the computer sees it owwn sign, it adds a point for the axis value
+            if (sign == mySign && field[x, y] == mySign)
+                value++;
+
+            //Every time the computer finds opponent sign, it subtracts a point from the axis value
+            else if (sign == mySign && field[x, y] == opponentSign)
+                value--;
+
+            //Returns value for the position to axis value
+            return value;
+        }
+
+        static int CalculateXY(string[,] field, string sign, string mySign, string opponentSign, int line, int i)
+        {
+            //Calculates value for the first cross line (1, 5, 9)
+            int value = 0;
+
+            //The positions are easily found by using a for-loop
+            if (line == 0)
+            {
+                //Will add point for every own sign found
+                if (sign == mySign && field[i, i] == mySign)
+                    value++;
+
+                //Will subtract for every opponent sign found
+                else if (sign == mySign && field[i, i] == opponentSign)
+                    value--;
+            }
+
+            //Returns value for the line
+            return value;
+        }
+
+        static int CalculateYX(string[,] field, string sign, string mySign, string opponentSign, int line, int i, int yxValue)
+        {
+            //Calculates value for the second cross line ()
+            if (line == 0 && i == 0)
+            {
+                yxValue += YXValue(field, sign, mySign, opponentSign, 0, 2);
+
+                yxValue += YXValue(field, sign, mySign, opponentSign, 1, 1);
+
+                yxValue += YXValue(field, sign, mySign, opponentSign, 2, 0);
+            }
+
+            return yxValue;
+        }
+
+        static int YXValue(string[,] field, string sign, string mySign, string opponentSign, int cond1, int cond2)
+        {
+            int yxValue = 0;
+
+            if (sign == mySign && field[cond1, cond2] == mySign)
+                yxValue++;
+            else if (sign == mySign && field[cond1, cond2] == opponentSign)
+                yxValue--;
+
+            return yxValue;
         }
 
         static bool PlayerMove(string[,] field, int playerInput, string determineSign)
@@ -326,160 +535,23 @@ namespace TicTacToe
             return winner;
         }
 
-        static bool ComputerMove(string[,] field, string sign)
+        static bool InititalaizePlayer(string[,] field, int turn, int bannerPrint, int gameboardPrint)
         {
-            Random rnd = new Random();
+            bool validInput = false;
 
-            bool moveControl = false;
-
-            int[] xArray = new int[3],
-                  yArray = new int[3],
-                  xyArray = new int[1],
-                  yxArray = new int[1];
-
-            int xyValue = 0,
-                yxValue = 0;
-
-            int line = 0;
-
-            bool isCircle;
-
-            if (sign == "O")
-                isCircle = true;
-            else
-                isCircle = false;
+            bool playerTurn = true;
 
             do
             {
-                int xValue = 0,
-                    yValue = 0;
+                if (PlayerMove(field, PlayerInput(DetermineSign(turn)), DetermineSign(turn)) == true)
+                    validInput = true;
 
-                for (int i = 0; i < 3; i++)
-                {
-                    switch (isCircle)
-                    {
-                        case true:
-                            yValue += CalculateAxisValue(field, sign, "O", "X", line, i, yValue);
+                FormatText(bannerPrint, Banner(), field);
+                FormatText(gameboardPrint, GameBoard(), field);
 
-                            xValue += CalculateAxisValue(field, sign, "O", "X", i, line, xValue);
+            } while (validInput == false);
 
-                            xyValue += CalculateXY(field, sign, "O", "X", line, i, xyValue);
-
-                            yxValue = CalculateYX(field, sign, "O", "X", line, i, yxValue);
-
-                            break;
-
-                        case false:
-                            yValue += CalculateAxisValue(field, sign, "X", "O", line, i, yValue);
-
-                            xValue += CalculateAxisValue(field, sign, "X", "O", i, line, xValue);
-
-                            xyValue += CalculateXY(field, sign, "X", "O", line, i, xyValue);
-
-                            yxValue = CalculateYX(field, sign, "X", "O", line, i, yxValue);
-
-                            break;
-                    }
-                }
-
-                yArray[line] = yValue;
-                xArray[line] = xValue;
-                xyArray[0] = xyValue;
-                yxArray[0] = yxValue;
-
-                line++;
-
-            } while (line < 3);
-
-                line = 0;
-
-            while (moveControl == false && line < 1)
-            {
-                for (int i = 0; i < 3; i++)
-                {
-                    moveControl = AttackOrDefend(field, sign, xArray, yArray, xyArray, yxArray, moveControl, i, 2);
-                }
-
-                if (moveControl == false)
-                {
-                    for (int i = 0; i < 3; i++)
-                    {
-                        moveControl = AttackOrDefend(field, sign, xArray, yArray, xyArray, yxArray, moveControl, i, -2);
-                    }
-                }
-                line++;
-            }
-
-             moveControl = RndStrat(field, sign, rnd, moveControl);
-
-
-            if (moveControl == false)
-            {
-                for (int i = 1; i < 9; i++)
-                {
-                    moveControl = PlayerMove(field, i, sign);
-
-                    if (moveControl == true)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            return moveControl;
-        }
-
-        static int CalculateAxisValue(string[,] field, string sign, string mySign, string opponentSign, int x, int y, int value)
-        {
-            value = 0;
-
-            if (sign == mySign && field[x, y] == mySign)
-                value++;
-            else if (sign == mySign && field[x, y] == opponentSign)
-                value--;
-
-            return value;
-        }
-
-        static int CalculateXY(string[,] field, string sign, string mySign, string opponentSign, int line, int i, int value)
-        {
-            value = 0;
-
-            if (line == 0)
-            {
-                if (sign == mySign && field[i, i] == mySign)
-                    value++;
-                else if (sign == mySign && field[i, i] == opponentSign)
-                    value--;
-            }
-
-            return value;
-        }
-
-        static int CalculateYX(string[,] field, string sign, string mySign, string opponentSign, int line, int i, int yxValue)
-        {
-            if (line == 0 && i == 0)
-            {
-                yxValue += YXValue(field, sign, mySign, opponentSign, 0, 2);
-
-                yxValue += YXValue(field, sign, mySign, opponentSign, 1, 1);
-
-                yxValue += YXValue(field, sign, mySign, opponentSign, 2, 0);
-            }
-
-            return yxValue;
-        }
-
-        static int YXValue(string[,] field, string sign, string mySign, string opponentSign, int cond1, int cond2)
-        {
-            int yxValue = 0;
-
-            if (sign == mySign && field[cond1, cond2] == mySign)
-                yxValue++;
-            else if (sign == mySign && field[cond1, cond2] == opponentSign)
-                yxValue--;
-
-            return yxValue;
+            return playerTurn;
         }
 
         static bool AttackOrDefend(string[,] field, string sign, int[] xArray, int[] yArray, int[] xyArray, int[] yxArray, bool moveControl, int line, int playcondition)
@@ -602,25 +674,6 @@ namespace TicTacToe
             }
 
             return moveControl;
-        }
-
-        static bool InititalaizePlayer(string[,] field, int round, bool playerTurn, int bannerPrint, int gameboardPrint)
-        {
-            bool validInput = false;
-
-            playerTurn = true;
-
-            do
-            {
-                if (PlayerMove(field, PlayerInput(DetermineSign(round)), DetermineSign(round)) == true)
-                    validInput = true;
-
-                FormatText(bannerPrint, Banner(), field);
-                FormatText(gameboardPrint, GameBoard(), field);
-
-            } while (validInput == false);
-
-            return playerTurn;
         }
     }
 }
