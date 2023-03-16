@@ -25,8 +25,7 @@ namespace TicTacToe
             }
         }
 
-        #region Initialize game
-
+        #region ------------------------------ Initialize game ------------------------------
         /// <summary>
         /// Initializes the game
         /// </summary>
@@ -134,11 +133,9 @@ namespace TicTacToe
 
             return sign;
         }
-
         #endregion
 
-        #region UI
-
+        #region ------------------------------ UI ------------------------------
         /// <summary>
         /// Sets the fields to defualt
         /// </summary>
@@ -216,7 +213,7 @@ namespace TicTacToe
         /// <param name="bannerPrint"></param>
         /// <param name="gameboardPrint"></param>
         /// <param name="field"></param>
-        /// <returns>Reset promt</returns>
+        /// <returns>Bool reset promt</returns>
         static bool DisplayEndMessage(string message, int bannerPrint, int gameboardPrint, string[,] field)
         {
             bool resetGame = true;
@@ -265,28 +262,28 @@ namespace TicTacToe
         }
 
         /// <summary>
-        /// Sets gamebaord string
+        /// Sets gameboard string
         /// </summary>
-        /// <returns>Gameboard string </returns>
+        /// <returns>Gameboard string</returns>
         static string GameBoard()
         {
             //Default gameboard to be printed
             string gameBoard = "           _           _           \r\n" +
                                  "          | |         | |          \r\n" +
                                  "          | |         | |          \r\n" +
-                               "     {0}    | |    {1}    | |    {2}\r\n" +
+                               "      {0}    | |    {1}    | |    {2}\r\n" +
                                  "          | |         | |          \r\n" +
                                  " _________| |_________| |_________ \r\n" +
                                  "|_________| |_________| |_________|\r\n" +
                                  "          | |         | |          \r\n" +
                                  "          | |         | |          \r\n" +
-                               "     {3}    | |    {4}    | |    {5}\r\n" +
+                               "      {3}    | |    {4}    | |    {5}\r\n" +
                                  "          | |         | |          \r\n" +
                                  " _________| |_________| |_________ \r\n" +
                                  "|_________| |_________| |_________|\r\n" +
                                  "          | |         | |          \r\n" +
                                  "          | |         | |          \r\n" +
-                               "     {6}    | |    {7}    | |    {8}\r\n" +
+                               "      {6}    | |    {7}    | |    {8}\r\n" +
                                  "          | |         | |          \r\n" +
                                  "          |_|         |_|          \r\n" +
                                  "\r\n";
@@ -299,7 +296,7 @@ namespace TicTacToe
         /// </summary>
         /// <param name="field"></param>
         /// <param name="sign"></param>
-        /// <returns>Win or not</returns>
+        /// <returns>A bool to see if you win or not</returns>
         static bool DetermineWinner(string[,] field, string sign)
         {
             bool winner = false;
@@ -317,16 +314,14 @@ namespace TicTacToe
 
             return winner;
         }
-
         #endregion
 
-        #region Player
-
+        #region ------------------------------ Player ------------------------------
         /// <summary>
         /// Takes player input and saves it if it is valid
         /// </summary>
         /// <param name="player"></param>
-        /// <returns>Valid move</returns>
+        /// <returns>Int with the valid move</returns>
         static int PlayerInput(string player)
         {
             int move = -1;
@@ -351,7 +346,7 @@ namespace TicTacToe
         /// </summary>
         /// <param name="field"></param>
         /// <param name="bannerPrint"></param>
-        /// <returns>Gamemode</returns>
+        /// <returns>Int; value for the Gamemode</returns>
         static int StartChoice(string[,] field, int bannerPrint)
         {
             int firstPlayer;
@@ -430,11 +425,9 @@ namespace TicTacToe
 
             return validInput;
         }
-
         #endregion
 
-        #region Computer
-
+        #region ------------------------------ Computer ------------------------------
         /// <summary>
         /// Determines computer move
         /// </summary>
@@ -561,7 +554,7 @@ namespace TicTacToe
         /// <param name="opponentSign"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns>Value for the position to axis value</returns>
+        /// <returns>Int; value for the position to axis value</returns>
         static int CalculateAxisValue(string[,] field, string sign, string mySign, string opponentSign, int x, int y)
         {
             int value = 0;
@@ -586,7 +579,7 @@ namespace TicTacToe
         /// <param name="opponentSign"></param>
         /// <param name="line"></param>
         /// <param name="i"></param>
-        /// <returns>Value for the line</returns>
+        /// <returns>Int; value for the line</returns>
         static int CalculateXY(string[,] field, string sign, string mySign, string opponentSign, int line, int i)
         {
             int value = 0;
@@ -640,7 +633,7 @@ namespace TicTacToe
         /// <param name="opponentSign"></param>
         /// <param name="cond1"></param>
         /// <param name="cond2"></param>
-        /// <returns>Returns vlaue for the specific cordinate</returns>
+        /// <returns>Returns int vlaue for the specific cordinate</returns>
         static int YXValue(string[,] field, string sign, string mySign, string opponentSign, int cond1, int cond2)
         {
             //Made to save space and reuse code
@@ -847,7 +840,6 @@ namespace TicTacToe
 
             return moveControl;
         }
-
         #endregion
     }
 }
